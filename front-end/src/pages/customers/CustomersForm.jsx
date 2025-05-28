@@ -11,6 +11,8 @@ import Button from '@mui/material/Button'
 import InputMask from 'react-input-mask'
 import { feedbackWait, feedbackNotify, feedbackConfirm } from '../../ui/Feedback'
 import { useNavigate, useParams } from 'react-router-dom'
+import Customer from '../../models/Customer'
+import { ZodError } from 'zod'
 
 import fetchAuth from '../../lib/fetchAuth'
 
@@ -51,11 +53,13 @@ export default function CustomersForm() {
 
   const [state, setState] = React.useState({
     customer: { ...formDefaults },
-    formModified: false
+    formModified: false,
+    inputErrors: true
   })
   const {
     customer,
-    formModified
+    formModified,
+    inputErrors
   } = state
 
   // Se estivermos editando um cliente, precisamos carregar
@@ -110,6 +114,13 @@ export default function CustomersForm() {
 
     feedbackWait(true)
     try {
+
+      // Converte o campo birth_date de string para Date, caso exista
+      //if(customer.birth_date) customer.birth_date = new Date(customer.birth_date)
+
+      // Invoca a validação do Zod
+      Customer.parse(customer)
+
       // Invoca o fetch para enviar os dados ao back-end.
       // Se houver parâmetro na rota, significa que estamos alterando
       // um registro existente e, portanto, o verbo precisa ser PUT
@@ -128,8 +139,17 @@ export default function CustomersForm() {
 
     }
     catch(error) {
-      console.log(error)
-      feedbackNotify('ERRO: ' + error.message, 'error')
+      console.error(error)
+
+      if(error instanceof ZodError) {
+        // Formamos um objeto contendo os erros do Zod e os colocamos
+        // na variável de estado inputErrors
+        const errorMessages = {}
+        for(let i of error.issues) errorMessages[i.path[0]] = i.message
+        setState({ ...state, inputErrors: errorMessages })
+        feedbackNotify('Há campos com valores inválidos. Verifique.', 'error')
+      }
+      else feedbackNotify('ERRO: ' + error.message, 'error')
     }
     finally {
       feedbackWait(false)
@@ -166,6 +186,8 @@ export default function CustomersForm() {
             autoFocus
             value={customer.name}
             onChange={handleFieldChange}
+            error={Boolean(inputErrors?.name)}
+            helperText={inputErrors?.name}
           />
 
           <InputMask
@@ -180,6 +202,8 @@ export default function CustomersForm() {
                   label="CPF" 
                   fullWidth
                   required
+                  error={Boolean(inputErrors?.ident_document)}
+                  helperText={inputErrors?.ident_document}
                 />
             }
           </InputMask>
@@ -201,7 +225,9 @@ export default function CustomersForm() {
               slotProps={{
                 textField: {
                   variant: 'outlined',
-                  fullWidth: true
+                  fullWidth: true,
+                  error: Boolean(inputErrors?.birth_date),
+                  helperText: inputErrors?.birth_date
                 }
               }}
               onChange={ date => {
@@ -219,6 +245,8 @@ export default function CustomersForm() {
             required
             value={customer.street_name}
             onChange={handleFieldChange}
+            error={Boolean(inputErrors?.street_name)}
+            helperText={inputErrors?.street_name}
           />
 
           <TextField
@@ -229,6 +257,8 @@ export default function CustomersForm() {
             required
             value={customer.house_number}
             onChange={handleFieldChange}
+            error={Boolean(inputErrors?.house_number)}
+            helperText={inputErrors?.house_number}
           />
 
           <TextField
@@ -239,6 +269,8 @@ export default function CustomersForm() {
             /* required */
             value={customer.complements}
             onChange={handleFieldChange}
+            error={Boolean(inputErrors?.complements)}
+            helperText={inputErrors?.complements}
           />
 
           <TextField
@@ -249,6 +281,8 @@ export default function CustomersForm() {
             required
             value={customer.district}
             onChange={handleFieldChange}
+            error={Boolean(inputErrors?.district)}
+            helperText={inputErrors?.district}
           />
 
           <TextField
@@ -259,6 +293,8 @@ export default function CustomersForm() {
             required
             value={customer.municipality}
             onChange={handleFieldChange}
+            error={Boolean(inputErrors?.municipality)}
+            helperText={inputErrors?.municipality}
           />
 
           <TextField
@@ -270,6 +306,8 @@ export default function CustomersForm() {
             value={customer.state}
             select
             onChange={handleFieldChange}
+            error={Boolean(inputErrors?.state)}
+            helperText={inputErrors?.state}
           >
             {
               brazilianStates.map(s => 
@@ -286,6 +324,8 @@ export default function CustomersForm() {
             value={customer.phone}
             maskChar=" "
             onChange={handleFieldChange}
+            error={Boolean(inputErrors?.phone)}
+            helperText={inputErrors?.phone}
           >
             { () => 
               <TextField
@@ -306,6 +346,8 @@ export default function CustomersForm() {
             required
             value={customer.email}
             onChange={handleFieldChange}
+            error={Boolean(inputErrors?.email)}
+            helperText={inputErrors?.email}
           />
 
           <Box sx={{ 

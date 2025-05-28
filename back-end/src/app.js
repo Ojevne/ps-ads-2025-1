@@ -30,7 +30,7 @@ app.use('/', indexRouter)
 
 // Middleware de verificação de autorização
 import authMiddleware from './middleware/auth.js'
-//app.use(authMiddleware)
+app.use(authMiddleware)
 
 import customersRouter from './routes/customers.js'
 app.use('/customers', customersRouter)

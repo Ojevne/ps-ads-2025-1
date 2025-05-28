@@ -14,6 +14,9 @@ import { useNavigate, useParams } from 'react-router-dom'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
 
+import Car from '../../models/cars'
+import { ZodError } from 'zod'
+
 import fetchAuth from '../../lib/fetchAuth'
 
 export default function CarsForm() {
@@ -73,6 +76,7 @@ export default function CarsForm() {
     car,
     formModified
   } = state
+  
 
   /*Se estivermos editando um carro, precisamos carregar seus dados assim que o componente for carregado */
   React.useEffect(() => {
@@ -84,11 +88,12 @@ export default function CarsForm() {
   async function loadData() {
     feedbackWait(true)
     try {
-      const response = await fetchAuth.get('//' + params.id)
-      const result = await response.json()
-      
-      /*Converte o formato da data armazenado no banco de dados para o formato reconhecido pelo componente DatePicker */
-      if(result.selling_date) result.selling_date = parseISO(result.selling_date)
+      const result = await fetchAuth.get('/cars/' + params.id)
+  
+      if (result.selling_date) {
+        result.selling_date = parseISO(result.selling_date)
+      }
+  
       setState({ ...state, car: result, formModified: false })
     }
     catch(error) {
@@ -99,6 +104,7 @@ export default function CarsForm() {
       feedbackWait(false)
     }
   }
+  
 
   /* Preenche o campo do objeto car conforme o campo correspondente do formulário for modificado */
   function handleFieldChange(event) {
@@ -114,32 +120,61 @@ export default function CarsForm() {
   async function handleFormSubmit(event) {
     event.preventDefault()      // Impede o recarregamento da página
     feedbackWait(true)
+
     try {
-      /* Infoca o fetch para enviar os dados ao back-end.
-      Se houver parâmetro na rota, significa que estamos alterando
-      um registro existente e, portanto, o verbo precisa ser PUT */
-      if(params.id) {
-        await fetchAuth.put('/cars/' + params.id, car)
-      }
-      // Senão, envia com o método POST para criar um novo registro
-      else {
-        await fetchAuth.post('/cars', car)
+      // 🔍 Conversão dos tipos antes da validação
+      const carData = {
+        ...car,
+        selling_price: car.selling_price ? Number(car.selling_price) : undefined,
+        year_manufacture: Number(car.year_manufacture),
+        selling_date: car.selling_date ? new Date(car.selling_date) : undefined
       }
 
-      // Exibe uma mensagem de sucesso e vai para a página de listagem dos carros
+      // ⚠️ Limpa valores opcionais se estiverem vazios (evita erro de string)
+      if (carData.selling_price === '') carData.selling_price = undefined
+      if (carData.selling_date === '') carData.selling_date = undefined
+    
+      console.log('🔎 Tipos antes do parse:')
+      console.log('Tipo de selling_price:', typeof carData.selling_price, '| Valor:', carData.selling_price)
+      console.log('Tipo de year_manufacture:', typeof carData.year_manufacture, '| Valor:', carData.year_manufacture)
+      console.log('Tipo de selling_date:', typeof carData.selling_date, '| Valor:', carData.selling_date)
+    
+      // ✅ Validação com Zod
+      Car.parse(carData)
+    
+      // 💾 Envio ao back-end
+      if (params.id) {
+        await fetchAuth.put('/cars/' + params.id, carData)
+      } else {
+        await fetchAuth.post('/cars', carData)
+      }
+    
       feedbackNotify('Item salvo com sucesso.', 'success', 4000, () => {
-        // Retorna para a página de listagem
         navigate('..', { relative: 'path', replace: true })
       })
-
     }
     catch(error) {
       console.log(error)
+    
+      if (error instanceof ZodError) {
+        feedbackNotify('Erro de validação. Verifique os campos.', 'error')
+        for (let issue of error.errors) {
+          console.warn(`[${issue.path}] ${issue.message}`)
+        }
+        return  // ⚠️ Impede que o código continue após erro de validação
+      }
+    
       feedbackNotify('ERRO: ' + error.message, 'error')
     }
     finally {
       feedbackWait(false)
     }
+    
+    
+
+
+
+
   }
 
   // Função para voltar para a página anterior
