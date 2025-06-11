@@ -14,7 +14,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 
 import fetchAuth from '../../lib/fetchAuth'
 
-export default function UsersList() {
+export default function UsersListComponent() {
 
   const columns = [
     { 

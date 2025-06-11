@@ -12,7 +12,7 @@ import CustomersForm from '../pages/customers/CustomersForm'
 import CarsList from '../pages/cars/CarsList'
 import CarsForm from '../pages/cars/CarsForm'
 
-import UsersList from '../pages/users/UsersList'
+import UsersListComponent from '../pages/users/UsersList'
 import UsersForm from '../pages/users/UsersForm'
 
 const routes = [
@@ -73,7 +73,7 @@ const routes = [
   {
     route: '/users',
     description: 'Listagem de usuários',
-    element: <UsersList />,
+    element: <UsersListComponent />,
     userLevel: 2
   },
   {
