@@ -100,6 +100,10 @@ export default function UsersForm() {
       // campo 'password'
       if(!showPasswordFields) delete user.password
 
+
+      // Remover id antes de salvar (evita erro ao criar novo usuário)
+      delete user.id
+
       /*
         Se houver parâmetro na rota, significa que estamos modificando um
         usuário existente. A requisição será enviada ao back-end usando o

@@ -8,6 +8,8 @@ controller.create = async function (req, res) {
   try {
     console.log('📥 Dados recebidos no cadastro:', req.body)
 
+    delete req.body.id
+
     if(req.body.password) {
       req.body.password = await bcrypt.hash(req.body.password, 12)
     }
