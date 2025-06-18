@@ -6,34 +6,23 @@ const controller = {}   // Objeto vazio
 
 controller.create = async function (req, res) {
   try {
-    // Se existe o campo 'password' em req.body,
-    // é necessário gerar o hash da senha antes
-    // de armazená-lo no BD
+    console.log('📥 Dados recebidos no cadastro:', req.body)
+
     if(req.body.password) {
       req.body.password = await bcrypt.hash(req.body.password, 12)
     }
 
-    // Dentro do parâmetro req (requisição), haverá
-    // um objeto chamado "body" que contém as informações
-    // que queremos armazenar do BD. Então, invocamos o
-    // Prisma para fazer a interface com o BD, repassando
-    // o req.body
-    await prisma.user.create({ data: req.body })
+    const userCriado = await prisma.user.create({ data: req.body })
 
-    // Se der tudo certo, enviamos como resposta o 
-    // código HTTP apropriado, no caso
-    // HTTP 201: Created
+    console.log('✅ Usuário criado com sucesso:', userCriado)
     res.status(201).end()
   }
   catch(error) {
-    // Se algo de errado acontecer, cairemos aqui
-    // Nesse caso, vamos exibir o erro no console e enviar
-    // o código HTTP correspondente a erro do servidor
-    // HTTP 500: Internal Server Error
-    console.error(error)
-    res.status(500).end()
+    console.error('❌ Erro ao criar usuário:', error.stack || error)
+    res.status(500).json({ erro: 'Erro interno ao criar usuário' })
   }
 }
+
 
 controller.retrieveAll = async function (req, res) {
   try {
