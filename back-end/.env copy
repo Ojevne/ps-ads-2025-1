@@ -1,0 +1,37 @@
+# Environment variables declared in this file are automatically made available to Prisma.
+# See the documentation for more detail: https://pris.ly/d/prisma-schema#accessing-environment-variables-from-the-schema
+
+# Prisma supports the native connection string format for PostgreSQL, MySQL, SQLite, SQL Server, MongoDB and CockroachDB.
+# See the documentation for all the connection string options: https://pris.ly/d/connection-strings
+
+ALLOWED_ORIGINS="http://localhost:5173,http://127.0.0.1:5173"
+
+
+
+## PARA CASA
+
+#DATABASE_URL="postgresql://postgres.smfsobklrxqljpdooupq:batatinha1quando2nasce3@aws-0-sa-east-1.pooler.supabase.com:5432/postgres"
+
+#DIRECT_URL="postgresql://postgres.smfsobklrxqljpdooupq:batatinha1quando2nasce3@aws-0-sa-east-1.pooler.supabase.com:6543/postgres"
+
+
+
+## PARA FATEC
+
+DATABASE_URL="postgresql://postgres:fatec123*@localhost:5432/scripts"
+
+DIRECT_URL="postgresql://postgres:fatec123*@localhost:5432/scripts"
+
+
+
+
+ALLOWED_ORIGINS="http://localhost:5173,http://127.0.0.1:5173"
+
+TOKEN_SECRET="Não tinha medo o tal João de Santo Cristo que era o que todos diziam quando ele se perdeu"
+
+AUTH_COOKIE_NAME="__auth__"
+
+
+
+
+
