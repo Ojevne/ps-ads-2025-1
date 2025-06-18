@@ -65,8 +65,9 @@ export default function UsersForm() {
       setState({ ...state, inputErrors: {} })
 
       // Validação dos campos de senha e e-mail
-      user.email = user.email.toLowerCase()
-      user.confirm_email = user.confirm_email.toLowerCase()
+      user.email = user.email?.toLowerCase?.() ?? ''
+      user.confirm_email = user.confirm_email?.toLowerCase?.() ?? ''
+
       
       const msg = []
 
