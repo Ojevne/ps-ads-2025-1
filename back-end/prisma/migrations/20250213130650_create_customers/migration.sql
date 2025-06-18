@@ -1,7 +1,6 @@
 -- CreateTable
 CREATE TABLE "Customer" (
     "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,  -- Adicionando a coluna name
     "ident_document" TEXT NOT NULL,
     "birth_date" TIMESTAMP(3),
     "street_name" TEXT NOT NULL,

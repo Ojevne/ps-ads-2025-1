@@ -39,7 +39,6 @@ controller.create = async function (req, res) {
     const dados = prepararDadosParaValidacao(req.body)
 
     // Validação com Zod
-    console.log('📦 Dados recebidos para criação:', dados)
     Cars.parse(dados)
 
     await prisma.car.create({ data: dados })
