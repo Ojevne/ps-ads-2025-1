@@ -39,6 +39,7 @@ controller.create = async function (req, res) {
     const dados = prepararDadosParaValidacao(req.body)
 
     // Validação com Zod
+    console.log('📦 Dados recebidos para criação:', dados)
     Cars.parse(dados)
 
     await prisma.car.create({ data: dados })
@@ -46,6 +47,7 @@ controller.create = async function (req, res) {
   }
   catch (error) {
     console.error(error)
+    console.error('❌ Erro ao criar carro:', error.stack || error)
     if (error instanceof ZodError) res.status(422).send(error.issues)
     else res.status(500).end()
   }
